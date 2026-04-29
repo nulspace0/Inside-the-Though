@@ -1,0 +1,22 @@
+*
+
+!.gitignore
+!README.md
+!Assets/Project_Scripts/**
+!Assets/Project_Scene/**
+!Assets/Project_Assets/**
+!Assets/Project_Material/**
+!Assets/Project_music/**
+!Assets/TextMesh Pro/**
+!Packages/**
+!ProjectSettings/**
+
+!Assets/Project_Scripts/
+!Assets/Project_Scene/
+!Assets/Project_Assets/
+!Assets/Project_Material/
+!Assets/Project_music/
+!Assets/TextMesh Pro/
+!Packages/
+!ProjectSettings/
+!Assets/
