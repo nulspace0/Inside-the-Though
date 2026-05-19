@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8c719bb8c8b29104790588dad7a5e844
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331730
+  packageName: 'IndiDolls : Common Assets / URP'
+  packageVersion: 1.0
+  assetPath: Assets/TRAIBAG/IndiDolls/Common_Assets/Editor/IndiDolls_custom_shader_UI.cs
+  uploadId: 787130

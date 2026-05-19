@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 015ded2f9331e4ffdb975fd20910ea0c
+timeCreated: 1427814692
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 33711
+  packageName: LazyFog
+  packageVersion: draft
+  assetPath: Assets/LazyFog/Materials/fogmaterial.mat
+  uploadId: 57346

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b5c3da14c95db4343b7a9eea0c89bf0e
+timeCreated: 1427814643
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 33711
+  packageName: LazyFog
+  packageVersion: draft
+  assetPath: Assets/LazyFog/Shaders/LazyFog.shader
+  uploadId: 57346

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(git clone https://github.com/DmitryCSharp/Inside-the-Though.git \"C:\\\\Users\\\\Green\\\\Documents\\\\UnityProject\\\\Inside-the-Though\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Green\\\\Documents\\\\UnityProject\\\\VR_VnutriMysly\\\\Assets\" -Filter \"*.cs\" -Recurse)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(xargs grep -l \"HDRenderPipelineAsset\")",
+      "Bash(xargs grep -l \"HDRenderPipeline\")"
+    ]
+  }
+}
