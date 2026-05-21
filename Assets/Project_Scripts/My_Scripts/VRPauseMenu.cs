@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.UI;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Movement;
 /// <summary>
 /// VR Pause Menu — Meta Quest 3 и HTC Vive Cosmos Pro.
 /// Открытие: левый стик / кнопка Menu / кнопка Y.
@@ -40,10 +41,7 @@ public class VRPauseMenu : MonoBehaviour
     private float               _cooldown = 0f;
     private InputAction         _menuAction;
 
-    // Провайдер движения — ищем любой компонент с полем moveSpeed
-    private MonoBehaviour                  _moveProvider;
-    private System.Reflection.PropertyInfo _moveSpeedProp;
-    private System.Reflection.FieldInfo    _moveSpeedField;
+    private ContinuousMoveProvider         _moveProvider;
     private Slider                         _speedSlider;
     private TextMeshProUGUI                _speedLabel;
 
@@ -77,11 +75,17 @@ public class VRPauseMenu : MonoBehaviour
         }
 
         // Убираем ВСЕ старые InputModule — они блокируют XR-лучи
+        // DestroyImmediate нужен здесь: Destroy() асинхронный, модуль остаётся живым
+        // до конца кадра и блокирует EnableUIOnInteractors() ниже
         foreach (var old in es.GetComponents<BaseInputModule>())
         {
             if (old is XRUIInputModule) continue;
             Debug.Log($"[VRPauseMenu] Удаляем InputModule: {old.GetType().Name}");
+#if UNITY_EDITOR
+            DestroyImmediate(old);
+#else
             Destroy(old);
+#endif
         }
 
         // Добавляем XRUIInputModule если нет
@@ -241,47 +245,22 @@ public class VRPauseMenu : MonoBehaviour
 
     private void FindMoveProvider()
     {
-        var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance;
-        foreach (var mb in FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-        {
-            var prop = mb.GetType().GetProperty("moveSpeed", flags);
-            if (prop != null && prop.CanWrite)
-            {
-                _moveProvider  = mb;
-                _moveSpeedProp = prop;
-                _moveSpeedField = null;
-                Debug.Log($"[VRPauseMenu] Найден провайдер движения (property): {mb.GetType().Name}");
-                return;
-            }
-
-            var field = mb.GetType().GetField("moveSpeed", flags);
-            if (field != null)
-            {
-                _moveProvider   = mb;
-                _moveSpeedField = field;
-                _moveSpeedProp  = null;
-                Debug.Log($"[VRPauseMenu] Найден провайдер движения (field): {mb.GetType().Name}");
-                return;
-            }
-        }
-        Debug.LogWarning("[VRPauseMenu] Компонент с moveSpeed не найден — слайдер скорости неактивен");
+        _moveProvider = FindAnyObjectByType<ContinuousMoveProvider>(FindObjectsInactive.Include);
+        if (_moveProvider != null)
+            Debug.Log("[VRPauseMenu] ContinuousMoveProvider найден.");
+        else
+            Debug.LogWarning("[VRPauseMenu] ContinuousMoveProvider не найден — слайдер скорости неактивен");
     }
 
     private float GetCurrentSpeed()
     {
-        if (_moveProvider == null) return 6f;
-        if (_moveSpeedProp  != null) return (float)_moveSpeedProp.GetValue(_moveProvider);
-        if (_moveSpeedField != null) return (float)_moveSpeedField.GetValue(_moveProvider);
-        return 6f;
+        return _moveProvider != null ? _moveProvider.moveSpeed : 6f;
     }
 
     private void OnSpeedChanged(float value)
     {
         if (_moveProvider != null)
-        {
-            if (_moveSpeedProp  != null) _moveSpeedProp.SetValue(_moveProvider, value);
-            else if (_moveSpeedField != null) _moveSpeedField.SetValue(_moveProvider, value);
-        }
+            _moveProvider.moveSpeed = value;
         UpdateSpeedLabel(value);
     }
 
@@ -421,12 +400,17 @@ public class VRPauseMenu : MonoBehaviour
         var rt = go.AddComponent<RectTransform>();
         rt.anchoredPosition = pos; rt.sizeDelta = size;
 
+        // Прозрачный Image на корне — нужен чтобы TrackedDeviceGraphicRaycaster
+        // мог попасть в слайдер в любой точке его площади, не только на ручке
+        var hitArea = go.AddComponent<Image>();
+        hitArea.color = Color.clear;
+
         var slider = go.AddComponent<Slider>();
         slider.minValue = min;
         slider.maxValue = max;
         slider.value    = value;
 
-        // Фон трека
+        // Фон трека — raycastTarget=false, чтобы не перехватывать события раньше ручки
         var bg = new GameObject("Background");
         bg.transform.SetParent(go.transform, false);
         var bgRt = bg.AddComponent<RectTransform>();
@@ -434,8 +418,9 @@ public class VRPauseMenu : MonoBehaviour
         bgRt.sizeDelta = Vector2.zero; bgRt.anchoredPosition = Vector2.zero;
         var bgImg = bg.AddComponent<Image>();
         bgImg.color = new Color(0.1f, 0.15f, 0.3f, 1f);
+        bgImg.raycastTarget = false;
 
-        // Fill area
+        // Fill area — raycastTarget=false по той же причине
         var fillArea = new GameObject("Fill Area");
         fillArea.transform.SetParent(go.transform, false);
         var faRt = fillArea.AddComponent<RectTransform>();
@@ -451,8 +436,9 @@ public class VRPauseMenu : MonoBehaviour
         fillRt.sizeDelta = new Vector2(10, 0);
         var fillImg = fill.AddComponent<Image>();
         fillImg.color = sliderFill;
+        fillImg.raycastTarget = false;
 
-        // Handle
+        // Handle — увеличен до 60×60 для удобного захвата в VR
         var handleArea = new GameObject("Handle Slide Area");
         handleArea.transform.SetParent(go.transform, false);
         var haRt = handleArea.AddComponent<RectTransform>();
@@ -463,13 +449,23 @@ public class VRPauseMenu : MonoBehaviour
         var handle = new GameObject("Handle");
         handle.transform.SetParent(handleArea.transform, false);
         var hRt = handle.AddComponent<RectTransform>();
-        hRt.sizeDelta = new Vector2(40, 40);
-        var hImg = handle.AddComponent<Image>();
+        hRt.sizeDelta = new Vector2(120, 120); // зона попадания луча — большая
+        // Прозрачный Image на самом handle — нужен для raycast
+        var hHitImg = handle.AddComponent<Image>();
+        hHitImg.color = Color.clear;
+
+        // Визуальная ручка — дочерний объект, маленькая белая точка
+        var hVisual = new GameObject("Handle_Visual");
+        hVisual.transform.SetParent(handle.transform, false);
+        var hVisRt = hVisual.AddComponent<RectTransform>();
+        hVisRt.sizeDelta = new Vector2(44, 44);
+        hVisRt.anchoredPosition = Vector2.zero;
+        var hImg = hVisual.AddComponent<Image>();
         hImg.color = Color.white;
 
         slider.fillRect   = fillRt;
         slider.handleRect = hRt;
-        slider.targetGraphic = hImg;
+        slider.targetGraphic = hHitImg; // цветовые переходы на зоне попадания
         slider.direction  = Slider.Direction.LeftToRight;
 
         var hcb = slider.colors;

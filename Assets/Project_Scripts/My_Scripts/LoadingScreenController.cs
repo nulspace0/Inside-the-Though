@@ -15,7 +15,7 @@ public class LoadingScreenController : MonoBehaviour
 
     [Header("Настройки")]
     [SerializeField] private string nextSceneName = "Head";  // Сцена для загрузки
-    [SerializeField] private float  minLoadTime   = 4.5f;    // Минимальное время (сек)
+    [SerializeField] private float  minLoadTime   = 10f;     // Минимальное время (сек)
     [SerializeField] private float  messageDelay  = 0.9f;    // Пауза между сообщениями
 
     // ── Шуточные сообщения загрузки ──────────────────────────────────────

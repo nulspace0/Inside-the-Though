@@ -158,7 +158,8 @@ public class VRGazeLabelManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
         {
-            GazeTargetData data = hit.collider.GetComponent<GazeTargetData>();
+            GazeTargetData data = hit.collider.GetComponent<GazeTargetData>()
+                               ?? hit.collider.GetComponentInParent<GazeTargetData>();
 
             if (data != null)
             {
