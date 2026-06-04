@@ -11,9 +11,9 @@ with facts, puzzles, and visual effects.
 - Select a brain lobe on the main scene
 - Pop balloons with facts about the lobe
 - Connect synapses to unlock new objects
-- Read text labels by entering trigger zones<img width="1052" height="717" alt="4" src="https://github.com/user-attachments/assets/725b8225-93e3-4d8e-86e3-910e239673cc" />
+- Read text labels by entering trigger zones <img width="1541" height="1021" alt="заставка" src="https://github.com/user-attachments/assets/fa96947e-0951-4ab2-aabd-7558d7e4e89f" />
+<img width="1052" height="717" alt="4" src="https://github.com/user-attachments/assets/725b8225-93e3-4d8e-86e3-910e239673cc" />
 <img width="1383" height="1137" alt="1" src="https://github.com/user-attachments/assets/524fcf33-fc15-4042-b082-8a95e5451f76" />
-<img width="1541" height="1021" alt="заставка" src="https://github.com/user-attachments/assets/fa96947e-0951-4ab2-aabd-7558d7e4e89f" />
 <img width="988" height="955" alt="7" src="https://github.com/user-attachments/assets/62037e12-4130-484b-b827-ed5b774f77d7" />
 <img width="1042" height="840" alt="5" src="https://github.com/user-attachments/assets/29f111bf-70bf-4d32-8804-d5e72595f95a" />
 
