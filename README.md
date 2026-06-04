@@ -1,5 +1,6 @@
 VR educational game about the human brain. Unity 6.
 # Inside the Thought — VR Brain Education Game
+https://youtu.be/2R2fYcBn5U8
 
 A PC VR educational game for Meta Quest 3 (via Link/Air Link) 
 and HTC Vive Cosmos Pro. Players explore the human brain from 
